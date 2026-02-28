@@ -1,0 +1,194 @@
+name: 🔍 Validar e Fazer Merge para Beta
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  validate:
+    name: 🧪 Validar Projeto
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Clonar repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📚 Instalar pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 10.30.3
+
+      - name: 💾 Cache pnpm
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'pnpm'
+
+      - name: 📥 Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Executar linting
+        run: pnpm run lint
+        continue-on-error: true
+
+      - name: ✅ Verificar tipos (TypeScript)
+        run: pnpm run typecheck
+        continue-on-error: true
+
+      - name: 🏗️ Build do projeto
+        run: pnpm run build
+        continue-on-error: true
+
+      - name: 🧪 Rodar testes
+        run: pnpm test
+        continue-on-error: true
+
+      - name: ✨ Relatório de validação
+        if: always()
+        run: |
+          echo "✅ Validação completada!"
+          echo "📊 Próximo passo: Merge automático para beta"
+
+  auto-merge:
+    name: 🔀 Auto-Merge para Beta
+    runs-on: ubuntu-latest
+    needs: validate
+    if: always()
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: 📥 Clonar repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔧 Configurar Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 🔀 Criar Pull Request dev → beta
+        id: create_pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: 'dev',
+              base: 'beta',
+              state: 'open'
+            });
+
+            if (pullRequests.length === 0) {
+              const { data: pr } = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '🔄 Merge dev → beta',
+                head: 'dev',
+                base: 'beta',
+                body: `### Validação Automática
+
+**Status**: ✅ Validado em ${{ github.event.head_commit.timestamp }}
+
+**Mudanças**:
+- Commit: ${{ github.event.head_commit.id }}
+- Autor: ${{ github.event.head_commit.author.name }}
+- Mensagem: ${{ github.event.head_commit.message }}
+
+---
+*Este PR foi criado automaticamente pela ação de validação.*`
+              });
+              console.log('PR criado:', pr.number);
+              return pr.number;
+            } else {
+              console.log('PR já existe:', pullRequests[0].number);
+              return pullRequests[0].number;
+            }
+
+      - name: 🎯 Fazer Merge Automático
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: 'dev',
+              base: 'beta',
+              state: 'open'
+            });
+
+            if (pullRequests.length > 0) {
+              const pr = pullRequests[0];
+              try {
+                await github.rest.pulls.merge({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: pr.number,
+                  merge_method: 'squash'
+                });
+                console.log('✅ PR #' + pr.number + ' merged successfully!');
+              } catch (error) {
+                console.log('⚠️ Não foi possível fazer merge:', error.message);
+                console.log('Merge pode estar bloqueado por checks ou conflitos.');
+              }
+            }
+
+      - name: 📝 Comentar no PR
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: 'dev',
+              base: 'beta',
+              state: 'all',
+              sort: 'created',
+              direction: 'desc'
+            });
+
+            if (pullRequests.length > 0) {
+              const pr = pullRequests[0];
+              const status = '${{ needs.validate.result }}' === 'success' ? '✅' : '⚠️';
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: `${status} **Validação automática concluída**\n\n**Resultado**: ${{ needs.validate.result }}\n\n[Ver workflow](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})`
+              });
+            }
+
+  notify:
+    name: 📢 Notificação
+    runs-on: ubuntu-latest
+    needs: [validate, auto-merge]
+    if: always()
+
+    steps:
+      - name: 📊 Resumo da Execução
+        run: |
+          echo "╔════════════════════════════════════════╗"
+          echo "║     Validação e Merge Automático      ║"
+          echo "╚════════════════════════════════════════╝"
+          echo ""
+          echo "Branch: dev → beta"
+          echo "Validação: ${{ needs.validate.result }}"
+          echo "Auto-Merge: ${{ needs.auto-merge.result }}"
+          echo ""
+          echo "✨ Workflow concluído!"

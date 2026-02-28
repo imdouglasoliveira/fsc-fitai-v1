@@ -21,7 +21,11 @@
       "mcp__plugin_playwright_playwright__browser_evaluate",
       "mcp__plugin_playwright_playwright__browser_run_code",
       "Bash(git remote add origin git@github-imdouglas:imdouglasoliveira/a8z-fitai.git)",
-      "Bash(git add -A)"
+      "Bash(git add -A)",
+      "Bash(git push -u origin master)",
+      "Bash(git checkout -b dev)",
+      "Bash(git push -u origin dev)",
+      "Bash(git add .github/)"
     ],
     "deny": [
       "Bash(rm -rf /)",
