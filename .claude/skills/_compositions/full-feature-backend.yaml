@@ -1,0 +1,77 @@
+# Skill Composition: Full Backend Feature
+# Composição automática de skills para desenvolvimento completo de feature backend
+version: 1.0
+name: "Full Backend Feature"
+description: "Composition for complete backend feature (routes + DB + tests + docs)"
+
+skills:
+  - skill: "/be"
+    description: "Backend implementation"
+    inputs:
+      story_id: "from_parent"
+      spec: "from_parent"
+      stack: "fastify"
+    outputs:
+      - "routes_created"
+      - "db_migrations"
+      - "services_implemented"
+
+  - skill: "/tdd"
+    description: "Unit + Integration tests"
+    inputs:
+      code: "from_previous"
+      coverage_target: 85
+    outputs:
+      - "unit_tests"
+      - "integration_tests"
+      - "coverage_report"
+
+  - skill: "/qa"
+    description: "QA validation"
+    inputs:
+      code: "from_previous"
+      tests: "from_previous"
+      story_id: "from_parent"
+    outputs:
+      - "qa_verdict"
+      - "issues_found"
+
+  - skill: "/commit-dev"
+    description: "Commit to dev branch"
+    inputs:
+      changes: "from_previous"
+      story_id: "from_parent"
+      message_template: "feat(backend): implement {story_title}"
+    outputs:
+      - "commit_hash"
+      - "branch_updated"
+
+decision_gates:
+  after_be:
+    condition: "coverage_target >= 80"
+    action: "proceed_to_tdd"
+    on_fail: "request_code_improvement"
+
+  after_tdd:
+    condition: "test_coverage >= coverage_target"
+    action: "proceed_to_qa"
+    on_fail: "request_more_tests"
+
+  after_qa:
+    condition: "verdict == PASS"
+    action: "proceed_to_commit"
+    on_fail: "return_to_dev_fixes"
+
+success_metrics:
+  - "routes working (tested)"
+  - "db migrations applied"
+  - "tests green (85%+ coverage)"
+  - "code committed to dev"
+
+estimated_duration_minutes: 120
+
+notes: |
+  - Runs skills sequentially (BE → TDD → QA → Commit)
+  - Each skill blocks until previous completes
+  - Automatic rollback if QA fails
+  - Decision gates ensure quality

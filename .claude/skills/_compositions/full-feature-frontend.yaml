@@ -1,0 +1,93 @@
+# Skill Composition: Full Frontend Feature
+# Composição automática de skills para desenvolvimento completo de feature frontend
+version: 1.0
+name: "Full Frontend Feature"
+description: "Composition for complete frontend feature (components + hooks + tests + styling)"
+
+skills:
+  - skill: "/fe"
+    description: "Frontend components + hooks"
+    inputs:
+      story_id: "from_parent"
+      spec: "from_parent"
+      stack: "next.js"
+    outputs:
+      - "components_created"
+      - "hooks_created"
+      - "styling_done"
+
+  - skill: "/tdd"
+    description: "Component + Integration tests"
+    inputs:
+      code: "from_previous"
+      coverage_target: 85
+      test_type: "react"
+    outputs:
+      - "component_tests"
+      - "integration_tests"
+      - "coverage_report"
+
+  - skill: "/react-doctor"
+    description: "React best practices validation"
+    inputs:
+      code: "from_previous"
+    outputs:
+      - "react_issues"
+      - "recommendations"
+
+  - skill: "/qa"
+    description: "QA validation + visual check"
+    inputs:
+      code: "from_previous"
+      tests: "from_previous"
+      story_id: "from_parent"
+      check_visual: true
+    outputs:
+      - "qa_verdict"
+      - "issues_found"
+
+  - skill: "/commit-dev"
+    description: "Commit to dev branch"
+    inputs:
+      changes: "from_previous"
+      story_id: "from_parent"
+      message_template: "feat(frontend): implement {story_title}"
+    outputs:
+      - "commit_hash"
+      - "branch_updated"
+
+decision_gates:
+  after_fe:
+    condition: "components_properly_structured"
+    action: "proceed_to_tdd"
+    on_fail: "request_refactor"
+
+  after_tdd:
+    condition: "test_coverage >= coverage_target"
+    action: "proceed_to_react_doctor"
+    on_fail: "request_more_tests"
+
+  after_react_doctor:
+    condition: "no_critical_issues"
+    action: "proceed_to_qa"
+    on_fail: "fix_react_issues"
+
+  after_qa:
+    condition: "verdict == PASS"
+    action: "proceed_to_commit"
+    on_fail: "return_to_dev_fixes"
+
+success_metrics:
+  - "components working (tested)"
+  - "hooks properly isolated"
+  - "tests green (85%+ coverage)"
+  - "react best practices followed"
+  - "code committed to dev"
+
+estimated_duration_minutes: 150
+
+notes: |
+  - Runs skills sequentially (FE → TDD → ReactDoctor → QA → Commit)
+  - Visual validation done during QA phase
+  - React-specific best practices enforced
+  - Automatic rollback if QA fails
