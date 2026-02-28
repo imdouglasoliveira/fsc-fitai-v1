@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig", //autocomplete
+  "compilerOptions": {
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "es2024", //for use ESM
+    "skipLibCheck": true,
+    "strict": true,
+    "outDir": "./dist"
+  },
+  "include": ["src"]
+}

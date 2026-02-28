@@ -1,0 +1,46 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(claude/approved-plans/**)",
+      "Read(**/*)",
+      "Write(**/*)",
+      "Edit(**/*)",
+      "Bash",
+      "WebFetch",
+      "WebSearch",
+      "Task",
+      "Glob",
+      "Grep",
+      "NotebookEdit",
+      "Bash(git pull:*)",
+      "Skill(*)",
+      "mcp__plugin_playwright_playwright__browser_network_requests",
+      "mcp__plugin_playwright_playwright__browser_press_key",
+      "mcp__plugin_playwright_playwright__browser_file_upload",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "mcp__plugin_playwright_playwright__browser_run_code",
+      "Bash(git remote add origin git@github-imdouglas:imdouglasoliveira/a8z-fitai.git)",
+      "Bash(git add -A)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf /*)",
+      "Bash(sudo rm -rf:*)",
+      "Bash(mkfs:*)",
+      "Bash(dd if=/dev/zero:*)",
+      "Bash(chmod -R 777 /)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\dsoliveira\\Documents\\Github\\data_exploration_rfcl_vue\\.temp\\fixs"
+    ]
+  },
+  "hooks": {},
+  "outputStyle": "default",
+  "language": "portuguese",
+  "sandbox": {
+    "enabled": false
+  },
+  "alwaysThinkingEnabled": true
+}
