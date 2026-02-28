@@ -37,7 +37,8 @@
       "Bash(chmod -R 777 /)"
     ],
     "additionalDirectories": [
-      "C:\\Users\\dsoliveira\\Documents\\Github\\data_exploration_rfcl_vue\\.temp\\fixs"
+      "C:\\Users\\dsoliveira\\Documents\\Github\\data_exploration_rfcl_vue\\.temp\\fixs",
+      "c:\\Users\\dsoliveira\\Documents\\Github\\FSW\\bootcamp-sgt\\.claude\\skills"
     ]
   },
   "hooks": {},

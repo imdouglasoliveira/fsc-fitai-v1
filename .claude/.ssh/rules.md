@@ -2,8 +2,9 @@
 
 ## Branches
 
-- Branch `MAIN` SEMPRE é a default, é a branch de **PRODUÇÃO**
+- Branch `MAIN` / `MASTER` - SEMPRE é a default, é a branch de **PRODUÇÃO**
 - Branch `DEV` é a branch de **DESENVOLVIMENTO**
+- SEMPRE que fazemos commits e push para a branch `dev` deve ser feito automerge com a action criada para a branch `beta` que é a branch de **TESTES**.
 
 ## Commits e Pushes
 
