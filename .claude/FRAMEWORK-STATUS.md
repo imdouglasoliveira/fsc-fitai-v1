@@ -1,4 +1,4 @@
-# A8Z Framework — Status & Completion Summary
+# a8z Framework — Status & Completion Summary
 
 **Date:** 2026-02-28
 **Status:** 71% Complete (5 of 7 phases)
@@ -236,7 +236,7 @@ ea80c25 → feat: Phase 3 - Skill Composition
 
 ## Summary
 
-The **A8Z Framework is now 71% complete** with 5 of 7 phases fully implemented:
+The **a8z Framework is now 71% complete** with 5 of 7 phases fully implemented:
 
 1. ✅ Ralph Integration (autonomous spec exploration)
 2. ✅ BMAD Meta-Prompting (prompt optimization)
