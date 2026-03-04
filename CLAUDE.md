@@ -2,395 +2,126 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
----
+## Project Overview
 
-## 🏗️ Architecture Overview
+Sistema de Gestao de Treinos (Workout Management System) — fullstack bootcamp project from Fullstack Club. Backend API with Fastify, frontend with Next.js, PostgreSQL via Prisma ORM.
 
-**Bootcamp SGT** is a fullstack training management system with a **monorepo structure**:
+## Development Commands
 
-```
-bootcamp-sgt/
-├── src/                 # Root-level shared code (utilities, types)
-├── backend/             # Fastify + Node.js API (planned)
-│   ├── src/
-│   │   ├── routes/      # API endpoints
-│   │   ├── controllers/ # Business logic
-│   │   ├── services/    # Domain logic
-│   │   ├── repositories/# Data access (Prisma)
-│   │   └── middlewares/ # Auth, logging, error handling
-│   ├── prisma/          # Schema + migrations
-│   └── package.json
-│
-├── frontend/            # Next.js + React app (planned)
-│   ├── src/
-│   │   ├── app/         # Pages & layouts (App Router)
-│   │   ├── components/  # Reusable React components
-│   │   ├── services/    # API client code
-│   │   ├── hooks/       # Custom React hooks
-│   │   ├── types/       # TypeScript interfaces
-│   │   └── styles/      # Global styles
-│   └── package.json
-│
-├── .claude/             # Claude Code framework (A8Z)
-│   ├── agents/          # Intelligent agents
-│   ├── skills/          # Custom skills (/ralph, /bmad, /compose, etc.)
-│   ├── rules/           # Framework rules
-│   ├── memory/          # Decision audit trail
-│   └── prompts/         # Prompt versions & BMAD variants
-│
-└── .github/workflows/   # CI/CD pipelines
-```
-
-**Key Design Decisions:**
-- **Monorepo**: Single repo for backend + frontend (easier for full-stack changes)
-- **TypeScript everywhere**: Strict mode for type safety
-- **Database-first**: Prisma for type-safe ORM
-- **API-first**: Backend as independent service
-- **A8Z Framework**: AI-driven development system in `.claude/`
-
----
-
-## 🚀 Common Development Commands
-
-### Development (Root)
 ```bash
 pnpm install              # Install dependencies
-pnpm run dev              # Watch & run with tsx (if src/index.ts exists)
+pnpm dev                  # Start dev server with watch mode (tsx --watch src/index.ts)
 ```
 
-### Backend Development (when created)
-```bash
-cd backend
-pnpm install              # Install backend deps
-pnpm run dev              # Dev server with hot reload
-pnpm run build            # Compile TypeScript → dist/
-pnpm start                # Run production build
-pnpm run test             # Run unit tests
-pnpm run test:watch       # Watch mode for tests
-npx prisma migrate dev    # Create + apply DB migration
-npx prisma studio        # Open database UI
-```
+### Database (when Prisma is set up)
 
-### Frontend Development (when created)
 ```bash
-cd frontend
-pnpm install              # Install frontend deps
-pnpm run dev              # Dev server (localhost:3000)
-pnpm run build            # Production build
-pnpm run lint             # ESLint check
-pnpm run lint:fix         # Auto-fix lint issues
+docker compose up -d                  # Start PostgreSQL container
+npx prisma migrate dev                # Run migrations
+npx prisma generate                   # Generate Prisma client
+npx prisma studio                     # Open DB GUI
 ```
 
 ### Linting & Formatting
-```bash
-pnpm run lint             # ESLint across workspace
-pnpm run format           # Prettier format (at workspace level)
-pnpm run type-check       # TypeScript type checking
-```
-
-### Testing
-```bash
-pnpm run test             # Run all tests
-pnpm run test --watch     # Watch mode
-pnpm run test PATTERN     # Run matching tests
-```
-
----
-
-## 💻 Tech Stack Details
-
-| Layer | Technology | Notes |
-|-------|-----------|-------|
-| **Runtime** | Node.js v18+ | ES modules enabled |
-| **Backend Framework** | Fastify | High-performance API server |
-| **Frontend Framework** | Next.js 14+ | React with App Router (not Pages Router) |
-| **Language** | TypeScript 5.9.3 | Strict mode enabled |
-| **Database** | PostgreSQL + Prisma | Type-safe ORM |
-| **Package Manager** | pnpm 10.30.3 | Fast, lockfile-focused |
-| **Linting** | ESLint 9.39.3 | Code quality |
-| **Formatting** | Prettier 3.8.1 | Code style |
-| **Git Hooks** | Husky 9.1.7 | Pre-commit validation |
-
----
-
-## 🔧 Important Files & Configuration
-
-### Root Level
-- **package.json** — Workspace package manager configuration
-- **tsconfig.json** — TypeScript compiler options (strict mode)
-- **pnpm-lock.yaml** — Dependency lock file (commit this!)
-- **README.md** — Project overview & setup instructions
-
-### Environment Configuration
-- **backend/.env** — Backend secrets (DATABASE_URL, JWT_SECRET, PORT)
-- **frontend/.env.local** — Frontend config (NEXT_PUBLIC_API_URL)
-- **.env.example** — Template for environment variables
-
-### Development Tools
-- **eslintrc.js** — Linting rules (workspace)
-- **.prettierrc** — Code formatting rules
-- **.husky/** — Git hooks (run on commit)
-
-### A8Z Framework
-- **.claude/CLAUDE.md** — Portuguese development guide
-- **.claude/FRAMEWORK-STATUS.md** — Framework completion status
-- **.claude/agents/** — Ralph Governor, Skill Composer, Memory Manager, Workflow Router
-- **.claude/skills/** — `/ralph`, `/bmad`, `/compose`, `/audit`, `/workflow-select`, `/status`
-- **.claude/memory/decision-log.json** — Decision audit trail (127+ decisions logged)
-- **.claude/prompts/REGISTRY.md** — Prompt versions with scores
-
----
-
-## 🏛️ Backend Architecture (Fastify)
-
-When implementing backend features:
-
-1. **Routes** (`src/routes/`) — Define HTTP endpoints
-   - Structure: `router.get('/resource', controller.action)`
-   - Return consistent JSON responses
-
-2. **Controllers** (`src/controllers/`) — Handle HTTP layer
-   - Parse requests, validate input
-   - Call services, return responses
-   - Keep thin—delegate to services
-
-3. **Services** (`src/services/`) — Business logic
-   - Domain rules, calculations, workflows
-   - Call repositories for data access
-   - Handle errors & edge cases
-
-4. **Repositories** (`src/repositories/`) — Data access layer
-   - Prisma-based database operations
-   - Type-safe queries
-   - No business logic here
-
-5. **Middlewares** (`src/middlewares/`) — Cross-cutting concerns
-   - Authentication, logging, error handling
-   - CORS, request parsing
-
-**Example structure for a feature:**
-```
-backend/src/
-├── routes/users.ts         (GET /users, POST /users)
-├── controllers/userController.ts
-├── services/userService.ts
-└── repositories/userRepository.ts (Prisma queries)
-```
-
----
-
-## ⚛️ Frontend Architecture (Next.js)
-
-When implementing frontend features:
-
-1. **App Router** (`src/app/`) — Page routes (NOT Pages Router)
-   - `app/page.tsx` → `/`
-   - `app/dashboard/page.tsx` → `/dashboard`
-   - Supports layouts, nested routes
-
-2. **Components** (`src/components/`) — Reusable UI
-   - Small, focused, single responsibility
-   - Props over state when possible
-   - Use Server Components by default, `'use client'` when needed
-
-3. **Hooks** (`src/hooks/`) — Reusable logic
-   - Custom React hooks for shared behavior
-   - API calling, state management, animations
-   - Extracted from components for reusability
-
-4. **Services** (`src/services/`) — API integration
-   - API client functions (fetch/axios)
-   - Base URL from `NEXT_PUBLIC_API_URL`
-   - Error handling & response typing
-
-5. **Types** (`src/types/`) — TypeScript definitions
-   - API request/response types
-   - Domain models
-   - Shared interfaces
-
-**Example file structure for a feature:**
-```
-frontend/src/
-├── app/
-│   └── users/
-│       └── page.tsx              (Page route)
-├── components/
-│   ├── UserCard.tsx              (Presentational)
-│   └── UserForm.tsx              (Form with hooks)
-├── hooks/
-│   ├── useUsers.ts               (API calls)
-│   └── useUserForm.ts            (Form state)
-├── services/
-│   └── userService.ts            (API client)
-└── types/
-    └── user.ts                   (User type definitions)
-```
-
----
-
-## 📝 Code Naming Conventions
-
-- **Variables/Functions**: `camelCase` (`userName`, `getUserById()`)
-- **Constants**: `UPPER_SNAKE_CASE` (`API_BASE_URL`, `MAX_RETRIES`)
-- **Classes/Types**: `PascalCase` (`User`, `UserService`, `IUserRepository`)
-- **Files**: `kebab-case` for components/routes (`user-card.tsx`), `camelCase` for utilities
-- **Exports**: Named exports preferred over default (easier refactoring)
-
----
-
-## 🔐 Environment & Secrets
-
-**Never commit sensitive data.** Use environment variables:
 
 ```bash
-# Backend .env (git-ignored)
-DATABASE_URL="postgresql://user:pass@localhost/dbname"
-JWT_SECRET="your-secret-key"
-PORT=3001
-
-# Frontend .env.local (git-ignored)
-NEXT_PUBLIC_API_URL="http://localhost:3001"
+npx eslint .              # Lint (ESLint 9 flat config)
+npx prettier --check .    # Check formatting
+npx prettier --write .    # Fix formatting
 ```
 
-**Note**: `NEXT_PUBLIC_*` variables are exposed to the browser. Only public config here.
+No test framework is configured yet.
 
----
+## Tech Stack
 
-## 🔄 Development Workflow
+- **Runtime**: Node.js (ESM modules, `"type": "module"`)
+- **Language**: TypeScript 5.9 (strict mode, target ES2024, module nodenext)
+- **Package Manager**: pnpm 10.30
+- **Backend**: Fastify with Zod type provider for validation
+- **Database**: PostgreSQL 16 (Docker) + Prisma ORM with `@prisma/adapter-pg`
+- **Auth**: better-auth library
+- **API Docs**: Swagger via `@fastify/swagger` + Scalar API Reference at `/docs`
+- **Frontend**: Next.js (planned, not yet scaffolded)
 
-1. **Create feature branch**
-   ```bash
-   git checkout -b feature/user-authentication
-   ```
+## Architecture (reference from .backups/)
 
-2. **Make changes** — follow architecture patterns above
+The `.backups/bootcamp-treinos-aula-00/` directory contains the instructor's reference implementation. The target architecture follows this pattern:
 
-3. **Test locally**
-   ```bash
-   pnpm run test                    # Unit tests
-   pnpm run lint                    # Code quality
-   cd backend && pnpm run dev       # Run backend
-   cd frontend && pnpm run dev      # Run frontend (separate terminal)
-   ```
-
-4. **Commit with Conventional Commits**
-   ```bash
-   git commit -m "feat: add user authentication"
-   git commit -m "fix: resolve login validation bug"
-   ```
-
-5. **Push & create PR**
-   ```bash
-   git push origin feature/user-authentication
-   ```
-
----
-
-## 🤖 a8z Framework (Claude Code Integration)
-
-This project includes the **a8z Framework** — an AI-driven development system:
-
-### Available Skills
-- **/ralph** {story-id} — Autonomous exploration of ambiguous requirements
-- **/bmad** {phase} — Prompt optimization & variant testing
-- **/compose** {story-id} — Automatic skill orchestration
-- **/audit** {story-id|--monthly} — Decision audit trail & learning
-- **/workflow-select** {story-id} — Intelligent workflow routing
-- **/status** {story-id|--full} — System dashboard
-
-### Framework Features
-- ✅ **Autonomous Loops** — Ralph explores ambiguous specs iteratively
-- ✅ **Prompt Optimization** — BMAD tests & promotes prompt variants
-- ✅ **Skill Composition** — Auto-orchestrates workflow sequences
-- ✅ **Memory System** — Captures decisions & learns from outcomes
-- ✅ **Workflow Routing** — Recommends Ralph vs SDD vs Rapid paths
-
-### How to Use
-```bash
-# For ambiguous requirements:
-/workflow-select STORY-42        # Get workflow recommendation
-/ralph STORY-42                  # Run autonomous exploration
-
-# For prompt testing:
-/bmad 02-spec                    # Test & compare prompt variants
-
-# For implementation:
-/compose STORY-42                # Auto-detect best composition
-
-# For learning:
-/audit STORY-42                  # Capture decision + outcome
-/audit --monthly                 # Monthly learning review
+```
+src/
+├── index.ts              # Fastify server setup, plugin registration, route mounting
+├── lib/
+│   ├── auth.ts           # better-auth configuration
+│   └── db.ts             # Prisma client singleton (with PrismaPg adapter)
+├── routes/               # Fastify route plugins (registered with prefix)
+├── usecases/             # Business logic (one file per use case, PascalCase)
+├── schemas/              # Zod schemas for validation
+├── errors/               # Custom error types
+└── generated/prisma/     # Auto-generated Prisma client (from prisma generate)
 ```
 
-See `.claude/FRAMEWORK-STATUS.md` for detailed a8z framework status.
+Key patterns:
+- Routes are Fastify plugins registered with `app.register(routes, { prefix })`.
+- Validation uses `fastify-type-provider-zod` — schemas defined with Zod, type-safe request/response.
+- Use cases are standalone functions that receive dependencies and return results.
+- Prisma client uses the PostgreSQL adapter (`@prisma/adapter-pg`) with a global singleton pattern.
+- Auth routes are proxied through Fastify to better-auth at `/api/auth/*`.
+- Imports use `.js` extensions (required for ESM with nodenext resolution).
 
----
+## Conventions
 
-## 📚 Key Patterns
+- **Commits**: Conventional Commits (`feat:`, `fix:`, `docs:`, etc.)
+- **Branches**: `master` (prod), `dev` (development), `feature/*`, `fix/*`, `hotfix/*`
+- **Imports**: Sorted by `eslint-plugin-simple-import-sort` (auto-sorted, errors on unsorted)
+- **Formatting**: Prettier (no custom config — uses defaults)
+- **ESM**: All imports must use `.js` extension for local files (TypeScript nodenext requirement)
 
-### Error Handling
-- Backend: Use Fastify error plugins + typed exceptions
-- Frontend: Try/catch around API calls, show user-friendly errors
-- Never expose sensitive details to client
+## Environment Variables
 
-### Authentication
-- JWT tokens in Authorization header
-- Backend validates on protected routes
-- Frontend stores token in secure storage (NOT localStorage if possible)
-
-### Database Migrations
-```bash
-# Create migration after schema change
-npx prisma migrate dev --name add_user_fields
-
-# Always commit prisma/migrations/
+```
+DATABASE_URL=postgresql://user:password@localhost:5432/sgt?schema=public
+JWT_SECRET=...
+PORT=8081
+NEXT_PUBLIC_API_URL=http://localhost:3001
 ```
 
-### TypeScript Strict Mode
-- No `any` types without good reason
-- Explicit return types on functions
-- Use discriminated unions for complex types
+## A8Z Framework (`.a8z/`)
 
----
+Para listar agents disponíveis: `npx a8z agent`
 
-## ⚙️ Useful Commands Reference
+Skills disponíveis em `.a8z/skills/`:
 
-| Command | Purpose |
-|---------|---------|
-| `pnpm install` | Install dependencies |
-| `pnpm run dev` | Start development servers |
-| `pnpm run build` | Production build |
-| `pnpm run test` | Run test suite |
-| `pnpm run lint` | ESLint check |
-| `npx prisma studio` | Open database UI |
-| `npx prisma migrate dev` | Create DB migration |
-| `git log --oneline` | View commit history |
-| `/commit` | Claude skill for structured commits |
-| `/status` | a8z dashboard |
+| Skill | Uso |
+|-------|-----|
+| **ralph** | Exploração iterativa de requisitos ambíguos (< 60% clareza) |
+| **bmad** | Otimização de prompts (Brazilian Method of AI Development) |
+| **compose** | Orquestração automática de múltiplos skills em sequência |
+| **be** | Implementação backend (APIs, rotas, banco) |
+| **fe** | Implementação frontend (React, componentes, UI) |
+| **tdd** | Desenvolvimento orientado a testes |
+| **qa** | Testes de qualidade e validação de cobertura |
+| **plan-to-tasks** | Converte planos/PRDs em tarefas acionáveis |
+| **commit-dev** | Commits estruturados com Conventional Commits |
+| **route** | Encontra modelo Claude mais econômico para a tarefa |
+| **status** | Dashboard e métricas do framework |
+| **audit** | Log de decisões e rastreabilidade |
+| **session-handover** | Transfere contexto para nova sessão |
+| **react-doctor** | Diagnóstico de saúde de projetos React |
+| **workflow-select** | Recomenda melhor workflow (Ralph/SDD/Rapid/Escalate) |
 
----
+Outros recursos em `.a8z/`:
+- `agents/` — Perfis de agentes especializados (dev, pm, po, qa, architect, etc.)
+- `rules/` — Regras de governança do framework
+- `playbooks/` — Templates de execução de fluxos
+- `checklists/` — Checklists de qualidade por fase
+- `memory/` — Decision log e aprendizado (`decision-log.json`)
+- `prompts/` — Prompts versionados
+- `templates/` — Templates de tarefas e PRDs
+- `stacks/` — Definições de stacks tecnológicas
 
-## 🔗 Documentation & Resources
+## Important Notes
 
-- **[README.md](README.md)** — Project overview
-- **[.claude/CLAUDE.md](.claude/CLAUDE.md)** — Detailed development guide (Portuguese)
-- **[.claude/FRAMEWORK-STATUS.md](.claude/FRAMEWORK-STATUS.md)** — a8z Framework status
-- **[Fastify Docs](https://www.fastify.io/)** — Backend framework
-- **[Next.js Docs](https://nextjs.org/)** — Frontend framework
-- **[Prisma Docs](https://www.prisma.io/)** — Database ORM
-- **[Conventional Commits](https://www.conventionalcommits.org/)** — Commit format
-
----
-
-## 🎯 When to Ask for Help
-
-- **Architecture questions** → Check existing patterns in backend/frontend folders
-- **Database schema** → Review `prisma/schema.prisma`
-- **API contract** → Check controllers & routes for expected request/response
-- **Style questions** → Look at existing code in the same layer
-- **Framework help** → Read `.claude/FRAMEWORK-STATUS.md` or use `/status`
-
----
-
-*Last Updated: 2026-02-28*
-*Framework: a8z v1.0 (Operational)*
+- The `*/.backups/` directory is gitignored and contains reference code from the bootcamp instructor — use it for guidance on the target implementation patterns.
+- The `*/.a8z/` directory is gitignored. It contains the A8Z framework for workflow orchestration (agents, rules, playbooks, skills). Not part of the application code.
+- The project is in early stages — `src/index.ts` currently only has a Hello World. The backend/frontend structure from README is the planned architecture.
+- Docker Compose provides PostgreSQL: `postgres:16-alpine` on port 5432 (user: postgres, password: password).

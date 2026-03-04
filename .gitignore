@@ -1,19 +1,8 @@
 # AI (Framework A8Z files ARE tracked)
 */.claude
 .claude/*
-# BUT: Include framework files
-!.claude/agents/
-!.claude/skills/
-!.claude/rules/
-!.claude/prompts/
-!.claude/templates/
-!.claude/*.md
-!.claude/*.local.md
-!.claude/*.json
-# Exclude only local/temp files
-.claude/memory/decision-log.json
-.claude/compositions/
-.claude/worktrees/
+.a8z/*
+*/.a8z
 
 # Backups
 .backups/
@@ -73,3 +62,10 @@ logs
 # Temporary files
 tmp/
 temp/
+.temp/*
+*/.temp
+# A8Z framework local/runtime
+.a8z/local/
+.a8z/worktrees/
+.a8z/outputs/
+.temp/
