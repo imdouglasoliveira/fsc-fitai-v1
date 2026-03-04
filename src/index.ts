@@ -14,7 +14,7 @@ const app = Fastify({
 app.setValidatorCompiler(validatorCompiler);
 app.setSerializerCompiler(serializerCompiler);
 
-app.register(fastifySwagger, {
+await app.register(fastifySwagger, {
   openapi: {
     info: {
       title: "Bootcamp Treinos API",
@@ -31,7 +31,7 @@ app.register(fastifySwagger, {
   transform: jsonSchemaTransform,
 });
 
-app.register(fastifySwaggerUi, {
+await app.register(fastifySwaggerUi, {
   routePrefix: "/docs",
 });
 
