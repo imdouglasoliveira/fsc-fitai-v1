@@ -61,6 +61,7 @@ src/
 ```
 
 Key patterns:
+
 - Routes are Fastify plugins registered with `app.register(routes, { prefix })`.
 - Validation uses `fastify-type-provider-zod` — schemas defined with Zod, type-safe request/response.
 - Use cases are standalone functions that receive dependencies and return results.
@@ -91,25 +92,26 @@ Para listar agents disponíveis: `npx a8z agent`
 
 Skills disponíveis em `.a8z/skills/`:
 
-| Skill | Uso |
-|-------|-----|
-| **ralph** | Exploração iterativa de requisitos ambíguos (< 60% clareza) |
-| **bmad** | Otimização de prompts (Brazilian Method of AI Development) |
-| **compose** | Orquestração automática de múltiplos skills em sequência |
-| **be** | Implementação backend (APIs, rotas, banco) |
-| **fe** | Implementação frontend (React, componentes, UI) |
-| **tdd** | Desenvolvimento orientado a testes |
-| **qa** | Testes de qualidade e validação de cobertura |
-| **plan-to-tasks** | Converte planos/PRDs em tarefas acionáveis |
-| **commit-dev** | Commits estruturados com Conventional Commits |
-| **route** | Encontra modelo Claude mais econômico para a tarefa |
-| **status** | Dashboard e métricas do framework |
-| **audit** | Log de decisões e rastreabilidade |
-| **session-handover** | Transfere contexto para nova sessão |
-| **react-doctor** | Diagnóstico de saúde de projetos React |
-| **workflow-select** | Recomenda melhor workflow (Ralph/SDD/Rapid/Escalate) |
+| Skill                | Uso                                                         |
+| -------------------- | ----------------------------------------------------------- |
+| **ralph**            | Exploração iterativa de requisitos ambíguos (< 60% clareza) |
+| **bmad**             | Otimização de prompts (Brazilian Method of AI Development)  |
+| **compose**          | Orquestração automática de múltiplos skills em sequência    |
+| **be**               | Implementação backend (APIs, rotas, banco)                  |
+| **fe**               | Implementação frontend (React, componentes, UI)             |
+| **tdd**              | Desenvolvimento orientado a testes                          |
+| **qa**               | Testes de qualidade e validação de cobertura                |
+| **plan-to-tasks**    | Converte planos/PRDs em tarefas acionáveis                  |
+| **commit-dev**       | Commits estruturados com Conventional Commits               |
+| **route**            | Encontra modelo Claude mais econômico para a tarefa         |
+| **status**           | Dashboard e métricas do framework                           |
+| **audit**            | Log de decisões e rastreabilidade                           |
+| **session-handover** | Transfere contexto para nova sessão                         |
+| **react-doctor**     | Diagnóstico de saúde de projetos React                      |
+| **workflow-select**  | Recomenda melhor workflow (Ralph/SDD/Rapid/Escalate)        |
 
 Outros recursos em `.a8z/`:
+
 - `agents/` — Perfis de agentes especializados (dev, pm, po, qa, architect, etc.)
 - `rules/` — Regras de governança do framework
 - `playbooks/` — Templates de execução de fluxos

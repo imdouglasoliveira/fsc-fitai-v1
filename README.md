@@ -24,15 +24,15 @@ Construir uma aplicação fullstack para gerenciamento de treinos acadêmicos, p
 
 ## 🛠️ Tecnologias Utilizadas
 
-| Tecnologia | Descrição |
-|------------|-----------|
-| **Node.js** | Runtime JavaScript para o backend |
-| **Fastify** | Framework web rápido e eficiente para API REST |
-| **TypeScript** | Superset JavaScript com tipagem estática |
-| **Next.js** | Framework React para frontend e SSR |
-| **Docker** | Containerização da aplicação |
-| **PostgreSQL** | Banco de dados relacional (sugestão) |
-| **Prisma** | ORM para interação com banco de dados |
+| Tecnologia     | Descrição                                      |
+| -------------- | ---------------------------------------------- |
+| **Node.js**    | Runtime JavaScript para o backend              |
+| **Fastify**    | Framework web rápido e eficiente para API REST |
+| **TypeScript** | Superset JavaScript com tipagem estática       |
+| **Next.js**    | Framework React para frontend e SSR            |
+| **Docker**     | Containerização da aplicação                   |
+| **PostgreSQL** | Banco de dados relacional (sugestão)           |
+| **Prisma**     | ORM para interação com banco de dados          |
 
 ## 📂 Estrutura do Projeto
 
@@ -122,30 +122,35 @@ npm run dev
 ## 📚 Funcionalidades
 
 ### Módulo de Autenticação
+
 - [ ] Login de usuários
 - [ ] Registro de novos usuários
 - [ ] Recuperação de senha
 - [ ] JWT Authentication
 
 ### Módulo de Alunos
+
 - [ ] Cadastro de alunos
 - [ ] Listagem de alunos
 - [ ] Edição de dados
 - [ ] Inativação de alunos
 
 ### Módulo de Treinos
+
 - [ ] Criação de planos de treino
 - [ ] Associação de exercícios
 - [ ] Definição de séries e repetições
 - [ ] Histórico de treinos
 
 ### Módulo de Exercícios
+
 - [ ] Cadastro de exercícios
 - [ ] Categorização (peito, costas, pernas, etc.)
 - [ ] Cadastro de equipamentos
 - [ ] Instruções e imagens
 
 ### Módulo de Relatórios
+
 - [ ] Dashboard com métricas
 - [ ] Relatório de frequência
 - [ ] Evolução dos alunos
