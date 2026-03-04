@@ -2,7 +2,6 @@ import "dotenv/config";
 
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
-
 import Fastify from "fastify";
 import {jsonSchemaTransform, serializerCompiler, validatorCompiler, ZodTypeProvider} from "fastify-type-provider-zod";
 import {z} from "zod";
