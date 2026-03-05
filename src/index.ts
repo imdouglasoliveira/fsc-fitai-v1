@@ -1,5 +1,6 @@
 import "dotenv/config";
 
+import fastifyCors from "@fastify/cors";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
 import Fastify from "fastify";
@@ -10,6 +11,8 @@ import {
   ZodTypeProvider,
 } from "fastify-type-provider-zod";
 import { z } from "zod";
+
+import { auth } from "./lib/auth.js";
 
 const app = Fastify({
   logger: true,
@@ -39,6 +42,11 @@ await app.register(fastifySwaggerUi, {
   routePrefix: "/docs",
 });
 
+await app.register(fastifyCors, {
+  origin: ["http://localhost:3000"],
+  credentials: true,
+});
+
 // Declare a route
 app.withTypeProvider<ZodTypeProvider>().route({
   method: "GET",
@@ -54,6 +62,48 @@ app.withTypeProvider<ZodTypeProvider>().route({
   },
   handler: () => {
     return { message: "Hello world!" };
+  },
+});
+
+app.route({
+  method: ["GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"],
+  url: "/api/auth/*",
+  async handler(request, reply) {
+    try {
+      const url = new URL(request.url, `http://${request.hostname}`);
+
+      const headers = new Headers();
+      for (const [key, value] of Object.entries(request.headers)) {
+        if (typeof value === "string") {
+          headers.append(key, value);
+        } else if (Array.isArray(value)) {
+          value.forEach((v) => headers.append(key, v));
+        }
+      }
+
+      const body =
+        request.method !== "GET" && request.method !== "HEAD" && request.body
+          ? JSON.stringify(request.body)
+          : undefined;
+
+      const betterAuthRequest = new Request(url, {
+        method: request.method,
+        headers,
+        body,
+      });
+
+      const response = await auth.handler(betterAuthRequest);
+
+      reply.status(response.status);
+      response.headers.forEach((value: string, key: string) => {
+        reply.header(key, value);
+      });
+
+      reply.send(await response.text());
+    } catch (error) {
+      request.log.error(error);
+      reply.status(500).send({ error: "Internal Server Error" });
+    }
   },
 });
 
