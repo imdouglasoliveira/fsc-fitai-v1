@@ -76,19 +76,23 @@ app.withTypeProvider<ZodTypeProvider>().route({
     body: z.object({
       name: z.string().trim().min(1),
       description: z.string().optional(),
-      workoutDays: z.array(z.object({
-        name: z.string().trim().min(1),
-        weekDay: z.enum(WeekDay),
-        isRest: z.boolean().default(false),
-        estimatedDurationInSeconds: z.number().min(1),
-        exercises: z.array(z.object({
+      workoutDays: z.array(
+        z.object({
           name: z.string().trim().min(1),
-          order: z.number().min(0).positive(),
-          sets: z.number().min(1),
-          reps: z.number().min(1),
-          restTimeInSeconds: z.number().min(1),
-        }))
-      }))
+          weekDay: z.enum(WeekDay),
+          isRest: z.boolean().default(false),
+          estimatedDurationInSeconds: z.number().min(1),
+          exercises: z.array(
+            z.object({
+              name: z.string().trim().min(1),
+              order: z.number().min(0).positive(),
+              sets: z.number().min(1),
+              reps: z.number().min(1),
+              restTimeInSeconds: z.number().min(1),
+            }),
+          ),
+        }),
+      ),
     }),
     response: {
       201: z.object({
@@ -96,23 +100,27 @@ app.withTypeProvider<ZodTypeProvider>().route({
         name: z.string(),
         description: z.string().optional(),
         createdAt: z.date(),
-        workoutDays: z.array(z.object({
-          id: z.string(),
-          name: z.string(),
-          weekDay: z.enum(WeekDay),
-          isRest: z.boolean(),
-          estimatedDurationInSeconds: z.number(),
-          createdAt: z.date(),
-          exercises: z.array(z.object({
+        workoutDays: z.array(
+          z.object({
             id: z.string(),
             name: z.string(),
-            order: z.number(),
-            sets: z.number(),
-            reps: z.number(),
-            restTimeInSeconds: z.number(),
+            weekDay: z.enum(WeekDay),
+            isRest: z.boolean(),
+            estimatedDurationInSeconds: z.number(),
             createdAt: z.date(),
-          }))
-        }))
+            exercises: z.array(
+              z.object({
+                id: z.string(),
+                name: z.string(),
+                order: z.number(),
+                sets: z.number(),
+                reps: z.number(),
+                restTimeInSeconds: z.number(),
+                createdAt: z.date(),
+              }),
+            ),
+          }),
+        ),
       }),
       400: z.object({
         error: z.string(),
@@ -129,20 +137,20 @@ app.withTypeProvider<ZodTypeProvider>().route({
       500: z.object({
         error: z.string(),
         statusCode: z.number(),
-      })
-    }
+      }),
+    },
   },
   handler: async (request, reply) => {
     try {
       const session = await auth.api.getSession({
-        headers: fromNodeHeaders(request.headers)
-      })
+        headers: fromNodeHeaders(request.headers),
+      });
 
       if (!session || !session.user) {
         return reply.status(401).send({
           error: "Unauthorized",
           statusCode: 401,
-        })
+        });
       }
 
       const createWorkoutPlan = new CreateWorkoutPlan();
