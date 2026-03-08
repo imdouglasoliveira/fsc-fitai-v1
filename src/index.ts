@@ -13,6 +13,7 @@ import {
 } from "fastify-type-provider-zod";
 import { z } from "zod";
 
+import { NotFoundError } from "./errors/index.js";
 import { WeekDay } from "./generated/prisma/enums.js";
 import { auth } from "./lib/auth.js";
 import { CreateWorkoutPlan } from "./usecases/CreateWorkoutPlan.js";
@@ -121,6 +122,10 @@ app.withTypeProvider<ZodTypeProvider>().route({
         error: z.string(),
         statusCode: z.number(),
       }),
+      404: z.object({
+        error: z.string(),
+        statusCode: z.number(),
+      }),
       500: z.object({
         error: z.string(),
         statusCode: z.number(),
@@ -149,6 +154,12 @@ app.withTypeProvider<ZodTypeProvider>().route({
       return reply.status(201).send(result);
     } catch (err) {
       request.log.error(err);
+      if (err instanceof NotFoundError) {
+        return reply.status(404).send({
+          error: err.message,
+          statusCode: 404,
+        });
+      }
       return reply.status(500).send({
         error: "Internal server error",
         statusCode: 500,
