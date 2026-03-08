@@ -2,7 +2,7 @@ import "dotenv/config";
 
 import fastifyCors from "@fastify/cors";
 import fastifySwagger from "@fastify/swagger";
-import { apiReference } from "@scalar/fastify-api-reference";
+import apiReference from "@scalar/fastify-api-reference";
 import { fromNodeHeaders } from "better-auth/node";
 import Fastify from "fastify";
 import {
@@ -120,27 +120,40 @@ app.withTypeProvider<ZodTypeProvider>().route({
       401: z.object({
         error: z.string(),
         statusCode: z.number(),
+      }),
+      500: z.object({
+        error: z.string(),
+        statusCode: z.number(),
       })
     }
   },
   handler: async (request, reply) => {
-    const session = await auth.api.getSession({
-      headers: fromNodeHeaders(request.headers)
-    })
-    if (!session || !session.user) {
-      return reply.status(401).send({
-        error: "Unauthorized",
-        statusCode: 401,
+    try {
+      const session = await auth.api.getSession({
+        headers: fromNodeHeaders(request.headers)
       })
-    }
-    const createWorkoutPlan = new CreateWorkoutPlan();
-    const result = await createWorkoutPlan.execute({
-      ...request.body,
-      userId: session.user.id,
-    });
 
-    reply.status(201);
-    return result;
+      if (!session || !session.user) {
+        return reply.status(401).send({
+          error: "Unauthorized",
+          statusCode: 401,
+        })
+      }
+
+      const createWorkoutPlan = new CreateWorkoutPlan();
+      const result = await createWorkoutPlan.execute({
+        ...request.body,
+        userId: session.user.id,
+      });
+
+      return reply.status(201).send(result);
+    } catch (err) {
+      request.log.error(err);
+      return reply.status(500).send({
+        error: "Internal server error",
+        statusCode: 500,
+      });
+    }
   },
 });
 

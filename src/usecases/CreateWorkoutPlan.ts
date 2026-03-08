@@ -1,3 +1,4 @@
+import { NotFoundError } from "../errors/index.js";
 import { PrismaClient } from "../generated/prisma/client.js";
 import { WeekDay } from "../generated/prisma/enums.js";
 import { prisma } from "../lib/db.js";
@@ -50,6 +51,14 @@ export class CreateWorkoutPlan {
   async execute(dto: InputDto): Promise<OutputDto> {
     // Transaction - Atomicidade
     return this.db.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: { id: dto.userId },
+      });
+
+      if (!user) {
+        throw new NotFoundError("Usuário não encontrado.");
+      }
+
       const existingWorkoutPlan = await tx.workoutPlan.findFirst({
         where: {
           userId: dto.userId,
