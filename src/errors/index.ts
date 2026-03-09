@@ -25,3 +25,10 @@ export class WorkoutPlanNotActiveError extends Error {
     this.name = "WorkoutPlanNotActiveError";
   }
 }
+
+export class OnboardingAlreadyCompletedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "OnboardingAlreadyCompletedError";
+  }
+}

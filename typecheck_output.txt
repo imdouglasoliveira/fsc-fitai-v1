@@ -1,0 +1,11 @@
+
+> bootcamp-sgt@1.0.0 typecheck C:\Users\dsoliveira\Documents\Github\FSC\bootcamp-sgt
+> tsc --noEmit
+
+src/usecases/CreateWorkoutPlan.ts(26,11): error TS1005: ':' expected.
+src/usecases/CreateWorkoutPlan.ts(56,7): error TS1005: ',' expected.
+src/usecases/CreateWorkoutPlan.ts(58,12): error TS1005: ':' expected.
+src/usecases/CreateWorkoutPlan.ts(58,18): error TS1005: ',' expected.
+src/usecases/CreateWorkoutPlan.ts(60,1): error TS1005: ',' expected.
+src/usecases/CreateWorkoutPlan.ts(60,2): error TS1005: '}' expected.
+ ELIFECYCLE  Command failed with exit code 2.

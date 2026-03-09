@@ -8,19 +8,34 @@ datasource db {
 }
 
 model User {
-  id            String        @id
+  id            String           @id
   name          String
-  email         String        @unique
-  password      String
+  email         String           @unique
+  password      String?
   workoutPlans  WorkoutPlan[]
-  createdAt     DateTime      @default(now()) @db.Timestamptz()
-  updatedAt     DateTime      @updatedAt @db.Timestamptz()
-  emailVerified Boolean       @default(false)
+  createdAt     DateTime         @default(now()) @db.Timestamptz()
+  updatedAt     DateTime         @updatedAt @db.Timestamptz()
+  emailVerified Boolean          @default(false)
   image         String?
   sessions      Session[]
   accounts      Account[]
+  trainData     UserTrainData?
+  assessments   UserAssessment[]
 
   @@map("user")
+}
+
+model UserTrainData {
+  userId              String   @id
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weightInGrams       Int
+  heightInCentimeters Int
+  age                 Int
+  bodyFatPercentage   Float
+  createdAt           DateTime @default(now()) @db.Timestamptz()
+  updatedAt           DateTime @updatedAt @db.Timestamptz()
+
+  @@map("user_train_data")
 }
 
 model WorkoutPlan {
@@ -36,13 +51,14 @@ model WorkoutPlan {
 }
 
 model WorkoutSession {
-  id           String     @id @default(uuid())
+  id           String           @id @default(uuid())
   workoutDayId String
-  workoutDay   WorkoutDay @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
-  startedAt    DateTime   @default(now()) @db.Timestamptz()
-  completedAt  DateTime?  @db.Timestamptz()
-  createdAt    DateTime   @default(now()) @db.Timestamptz()
-  updatedAt    DateTime   @updatedAt @db.Timestamptz()
+  workoutDay   WorkoutDay       @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
+  startedAt    DateTime         @default(now()) @db.Timestamptz()
+  completedAt  DateTime?        @db.Timestamptz()
+  createdAt    DateTime         @default(now()) @db.Timestamptz()
+  updatedAt    DateTime         @updatedAt @db.Timestamptz()
+  setLogs      ExerciseSetLog[]
 }
 
 enum WeekDay {
@@ -65,22 +81,110 @@ model WorkoutDay {
   exercises                  WorkoutExercise[]
   estimatedDurationInSeconds Int
   sessions                   WorkoutSession[]
-  coverImageUrl String?
+  coverImageUrl              String?
   createdAt                  DateTime          @default(now()) @db.Timestamptz()
   updatedAt                  DateTime          @updatedAt @db.Timestamptz()
 }
 
 model WorkoutExercise {
-  id                String     @id @default(uuid())
+  id                String           @id @default(uuid())
   name              String
   order             Int
   workoutDayId      String
-  workoutDay        WorkoutDay @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
+  workoutDay        WorkoutDay       @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
   sets              Int
   reps              Int
   restTimeInSeconds Int
-  createdAt         DateTime   @default(now()) @db.Timestamptz()
-  updatedAt         DateTime   @updatedAt @db.Timestamptz()
+  createdAt         DateTime         @default(now()) @db.Timestamptz()
+  updatedAt         DateTime         @updatedAt @db.Timestamptz()
+  setLogs           ExerciseSetLog[]
+}
+
+model ExerciseSetLog {
+  id                String          @id @default(uuid())
+  workoutSessionId  String
+  workoutSession    WorkoutSession  @relation(fields: [workoutSessionId], references: [id], onDelete: Cascade)
+  workoutExerciseId String
+  workoutExercise   WorkoutExercise @relation(fields: [workoutExerciseId], references: [id], onDelete: Cascade)
+  setNumber         Int // 1, 2, 3, 4...
+  repsCompleted     Int // reps reais realizadas
+  weightInGrams     Int // peso usado em gramas (0 = peso corporal)
+  setStartedAt      DateTime        @db.Timestamptz() // início da execução da série
+  setCompletedAt    DateTime        @db.Timestamptz() // fim da execução (descanso começa)
+  restInSeconds     Int? // descanso real em segundos (null na última série)
+  createdAt         DateTime        @default(now()) @db.Timestamptz()
+  updatedAt         DateTime        @updatedAt @db.Timestamptz()
+
+  @@index([workoutSessionId])
+  @@index([workoutExerciseId])
+  @@map("exercise_set_log")
+}
+
+enum AssessmentType {
+  ONBOARDING
+  MONTHLY
+}
+
+enum FitnessGoal {
+  LOSE_WEIGHT // Emagrecer
+  GAIN_MUSCLE // Ganhar músculo
+  CONDITIONING // Condicionamento
+  GENERAL_HEALTH // Saúde geral
+}
+
+enum ExperienceLevel {
+  BEGINNER // Iniciante (< 1 ano)
+  INTERMEDIATE // Intermediário (1-3 anos)
+  ADVANCED // Avançado (> 3 anos)
+}
+
+enum TrainingFrequency {
+  DAYS_2 // 2 dias/semana
+  DAYS_3 // 3 dias/semana
+  DAYS_4 // 4 dias/semana
+  DAYS_5_PLUS // 5 ou mais dias/semana
+}
+
+enum SessionDuration {
+  MIN_30_45 // 30-45 min
+  MIN_45_60 // 45-60 min
+  MIN_60_PLUS // Mais de 60 min
+}
+
+enum ActivityLevel {
+  LOW // Sedentário
+  MEDIUM // Médio
+  HIGH // Alto
+}
+
+enum EquipmentAccess {
+  FULL_GYM // Academia completa
+  HOME // Treino em casa
+  BASIC // Equipamento básico
+}
+
+model UserAssessment {
+  id                  String            @id @default(uuid())
+  userId              String
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type                AssessmentType // ONBOARDING ou MONTHLY
+  // Perguntas obrigatórias (1-7)
+  goal                FitnessGoal // Pergunta 1
+  experienceLevel     ExperienceLevel // Pergunta 2
+  trainingFrequency   TrainingFrequency // Pergunta 3
+  sessionDuration     SessionDuration // Pergunta 4
+  heightInCentimeters Int // Pergunta 5 (140-220)
+  weightInGrams       Int // Pergunta 6 (convertido de kg para gramas)
+  age                 Int // Pergunta 7 (14-80)
+  // Perguntas opcionais (8-10)
+  activityLevel       ActivityLevel? // Pergunta 8 (pode ser pulada)
+  equipmentAccess     EquipmentAccess? // Pergunta 9 (pode ser pulada)
+  injuryOrRestriction String? // Pergunta 10 (texto livre, pode ser pulado)
+  createdAt           DateTime          @default(now()) @db.Timestamptz()
+  updatedAt           DateTime          @updatedAt @db.Timestamptz()
+
+  @@index([userId])
+  @@map("user_assessment")
 }
 
 model Session {

@@ -79,3 +79,5 @@ null
 /tasks
 */tasks
 tasks/*
+.temp/*
+*/.temp
