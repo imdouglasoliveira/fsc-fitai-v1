@@ -69,3 +69,5 @@ temp/
 .a8z/worktrees/
 .a8z/outputs/
 .temp/
+
+/src/generated/prisma
