@@ -3,7 +3,11 @@ import { defineConfig } from "eslint/config";
 import eslintConfigPrettier from "eslint-config-prettier/flat";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import globals from "globals";
+import path from "path";
 import tseslint from "typescript-eslint";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig([
   {
@@ -15,7 +19,16 @@ export default defineConfig([
     extends: ["js/recommended"],
     languageOptions: { globals: globals.node },
   },
-  tseslint.configs.recommended,
+  {
+    files: ["**/*.{ts,mts,cts}"],
+    extends: [tseslint.configs.recommended],
+    languageOptions: {
+      parserOptions: {
+        project: "./tsconfig.json",
+        tsconfigRootDir: __dirname,
+      },
+    },
+  },
   eslintConfigPrettier,
   {
     plugins: {

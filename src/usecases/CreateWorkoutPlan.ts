@@ -120,7 +120,31 @@ export class CreateWorkoutPlan {
           },
         });
 
-        return result;
+        const output: OutputDto = {
+          id: result.id,
+          name: result.name,
+          description: result.description,
+          createdAt: result.createdAt,
+          workoutDays: result.workoutDays.map((day) => ({
+            id: day.id,
+            name: day.name,
+            weekDay: day.weekDay,
+            isRest: day.isRest,
+            estimatedDurationInSeconds: day.estimatedDurationInSeconds,
+            createdAt: day.createdAt,
+            exercises: day.exercises.map((exercise) => ({
+              id: exercise.id,
+              name: exercise.name,
+              order: exercise.order,
+              sets: exercise.sets,
+              reps: exercise.reps,
+              restTimeInSeconds: exercise.restTimeInSeconds,
+              createdAt: exercise.createdAt,
+            })),
+          })),
+        };
+
+        return output;
       },
     );
   }

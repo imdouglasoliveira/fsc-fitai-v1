@@ -7,7 +7,7 @@ import { NotFoundError } from "../errors/index.js";
 import { WeekDay } from "../generated/prisma/enums.js";
 import { auth } from "../lib/auth.js";
 import { ErrorSchema, WorkoutPlanSchema } from "../schemas/index.js";
-import { CreateWorkoutPlan } from "../usecases/CreateWorkoutPlan.js";
+import { CreateWorkoutPlan, OutputDto } from "../usecases/CreateWorkoutPlan.js";
 
 export const workoutPlanRoutes = async (app: FastifyInstance) => {
   app.withTypeProvider<ZodTypeProvider>().route({
@@ -57,7 +57,7 @@ export const workoutPlanRoutes = async (app: FastifyInstance) => {
         }
 
         const createWorkoutPlan = new CreateWorkoutPlan();
-        const result = await createWorkoutPlan.execute({
+        const result: OutputDto = await createWorkoutPlan.execute({
           ...request.body,
           userId: session.user.id,
         });
