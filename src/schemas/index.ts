@@ -4,6 +4,7 @@ import { WeekDay } from "../generated/prisma/enums.js";
 
 export const ErrorSchema = z.object({
   error: z.string(),
+  code: z.string(),
   statusCode: z.number(),
 });
 
@@ -34,4 +35,14 @@ export const WorkoutPlanSchema = z.object({
       ),
     })
   ),
+});
+
+export const StartWorkoutSessionResponseSchema = z.object({
+  userWorkoutSessionId: z.string().uuid(),
+});
+
+export const WorkoutSessionResponseSchema = z.object({
+  id: z.string().uuid(),
+  startedAt: z.date(),
+  completedAt: z.date().nullable(),
 });
