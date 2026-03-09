@@ -3,7 +3,6 @@ import "dotenv/config";
 import fastifyCors from "@fastify/cors";
 import fastifySwagger from "@fastify/swagger";
 import apiReference from "@scalar/fastify-api-reference";
-import { fromNodeHeaders } from "better-auth/node";
 import Fastify from "fastify";
 import {
   jsonSchemaTransform,
@@ -13,14 +12,8 @@ import {
 } from "fastify-type-provider-zod";
 import { z } from "zod";
 
-import { NotFoundError } from "./errors/index.js";
-import { WeekDay } from "./generated/prisma/enums.js";
 import { auth } from "./lib/auth.js";
-import { 
-  ErrorSchema,
-  WorkoutPlanSchema
- } from "./schemas/index.js";
-import { CreateWorkoutPlan } from "./usecases/CreateWorkoutPlan.js";
+import { workoutPlanRoutes } from "./routes/workout-plans.js";
 
 const app = Fastify({
   logger: true,
@@ -73,8 +66,7 @@ await app.register(apiReference as any, {
 });
 
 // Declare routes
-
-
+await app.register(workoutPlanRoutes, {prefix: "/workout-plan"});
 
 app.withTypeProvider<ZodTypeProvider>().route({
   method: "GET",

@@ -35,6 +35,16 @@ model WorkoutPlan {
   updatedAt   DateTime     @updatedAt
 }
 
+model WorkoutSession {
+  id          String       @id @default(uuid())
+  workoutDayId String
+  workoutDay  WorkoutDay   @relation(fields: [workoutDayId], references: [id])
+  startedAt   DateTime     @default(now())
+  completedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
 enum WeekDay {
   MONDAY
   TUESDAY
@@ -54,6 +64,7 @@ model WorkoutDay {
   weekDay                    WeekDay
   exercises                  WorkoutExercise[]
   estimatedDurationInSeconds Int
+  sessions                   WorkoutSession[]
   createdAt                  DateTime          @default(now())
   updatedAt                  DateTime          @updatedAt
 }
