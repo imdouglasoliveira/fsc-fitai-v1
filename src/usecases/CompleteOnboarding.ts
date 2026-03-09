@@ -7,9 +7,11 @@ import {
   ExperienceLevel,
   FitnessGoal,
   SessionDuration,
+  type Sex,
   TrainingFrequency,
 } from "../generated/prisma/enums.js";
 import { prisma } from "../lib/db.js";
+import { CalculateBodyMetrics } from "./CalculateBodyMetrics.js";
 
 interface InputDto {
   userId: string;
@@ -23,6 +25,10 @@ interface InputDto {
   activityLevel?: ActivityLevel;
   equipmentAccess?: EquipmentAccess;
   injuryOrRestriction?: string;
+  sex: Sex;
+  waistCm?: number;
+  neckCm?: number;
+  hipCm?: number;
 }
 
 export interface OutputDto {
@@ -38,6 +44,10 @@ export interface OutputDto {
   activityLevel: ActivityLevel | null;
   equipmentAccess: EquipmentAccess | null;
   injuryOrRestriction: string | null;
+  sex: Sex;
+  waistCm: number | null;
+  neckCm: number | null;
+  hipCm: number | null;
   createdAt: Date;
 }
 
@@ -71,6 +81,10 @@ export class CompleteOnboarding {
           activityLevel: dto.activityLevel,
           equipmentAccess: dto.equipmentAccess,
           injuryOrRestriction: dto.injuryOrRestriction,
+          sex: dto.sex,
+          waistCm: dto.waistCm ?? null,
+          neckCm: dto.neckCm ?? null,
+          hipCm: dto.hipCm ?? null,
         },
       });
 
@@ -91,6 +105,13 @@ export class CompleteOnboarding {
         },
       });
 
+      // Calculate body metrics automatically after onboarding
+      const calculateBodyMetrics = new CalculateBodyMetrics(tx as PrismaClient);
+      await calculateBodyMetrics.execute({
+        userId: dto.userId,
+        assessmentId: assessment.id,
+      });
+
       return {
         id: assessment.id,
         type: "ONBOARDING",
@@ -104,6 +125,10 @@ export class CompleteOnboarding {
         activityLevel: assessment.activityLevel,
         equipmentAccess: assessment.equipmentAccess,
         injuryOrRestriction: assessment.injuryOrRestriction,
+        sex: assessment.sex,
+        waistCm: assessment.waistCm,
+        neckCm: assessment.neckCm,
+        hipCm: assessment.hipCm,
         createdAt: assessment.createdAt,
       };
     });

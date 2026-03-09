@@ -54,6 +54,7 @@ export async function createTestUser(_app: FastifyInstance): Promise<{
 
 export async function cleanDatabase(): Promise<void> {
   const tables = [
+    "user_metrics",
     "exercise_set_log",
     "WorkoutSession",
     "WorkoutExercise",

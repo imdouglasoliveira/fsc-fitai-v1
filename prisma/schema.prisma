@@ -21,6 +21,7 @@ model User {
   accounts      Account[]
   trainData     UserTrainData?
   assessments   UserAssessment[]
+  metrics       UserMetrics[]
 
   @@map("user")
 }
@@ -163,6 +164,16 @@ enum EquipmentAccess {
   BASIC // Equipamento básico
 }
 
+enum Sex {
+  MALE
+  FEMALE
+}
+
+enum BodyFatMethod {
+  US_NAVY
+  CUN_BAE
+}
+
 model UserAssessment {
   id                  String            @id @default(uuid())
   userId              String
@@ -180,8 +191,14 @@ model UserAssessment {
   activityLevel       ActivityLevel? // Pergunta 8 (pode ser pulada)
   equipmentAccess     EquipmentAccess? // Pergunta 9 (pode ser pulada)
   injuryOrRestriction String? // Pergunta 10 (texto livre, pode ser pulado)
+  sex                 Sex // Sexo biológico (necessário para BMR e gordura corporal)
+  // Medidas de circunferência (opcionais, para método US Navy)
+  waistCm             Float? // Circunferência da cintura em cm
+  neckCm              Float? // Circunferência do pescoço em cm
+  hipCm               Float? // Circunferência do quadril em cm (obrigatório para US Navy feminino)
   createdAt           DateTime          @default(now()) @db.Timestamptz()
   updatedAt           DateTime          @updatedAt @db.Timestamptz()
+  metrics             UserMetrics?
 
   @@index([userId])
   @@map("user_assessment")
@@ -233,4 +250,40 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model UserMetrics {
+  id                  String         @id @default(uuid())
+  userId              String
+  user                User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessmentId        String         @unique
+  assessment          UserAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  // Métricas calculadas
+  bmr                 Int // kcal/dia (TMB)
+  tdee                Int // kcal/dia (TDEE)
+  bodyFatPercentage   Float // % estimado
+  bodyFatMethod       BodyFatMethod // Método usado para estimar gordura corporal
+  fatMassKg           Float // massa gorda em kg
+  leanMassKg          Float // massa magra em kg
+
+  // Meta calórica
+  caloricGoalMin      Int // kcal/dia (mínimo)
+  caloricGoalMax      Int // kcal/dia (máximo)
+
+  // Macros
+  proteinGrams        Int
+  carbsGrams          Int
+  fatGrams            Int
+
+  // Projeção de peso
+  projectionJson      Json // Array de DailyPoint[]
+  projectionWeeks     Int // Duração em semanas
+  projectedEndWeight  Float // Peso final projetado em kg
+
+  createdAt           DateTime @default(now()) @db.Timestamptz()
+  updatedAt           DateTime @updatedAt @db.Timestamptz()
+
+  @@index([userId])
+  @@map("user_metrics")
 }

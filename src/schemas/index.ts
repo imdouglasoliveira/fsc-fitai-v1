@@ -3,10 +3,12 @@ import { z } from "zod";
 import {
   ActivityLevel,
   AssessmentType,
+  BodyFatMethod,
   EquipmentAccess,
   ExperienceLevel,
   FitnessGoal,
   SessionDuration,
+  Sex,
   TrainingFrequency,
   WeekDay,
 } from "../generated/prisma/enums.js";
@@ -179,6 +181,10 @@ export const CompleteOnboardingBodySchema = z.object({
     .enum([EquipmentAccess.FULL_GYM, EquipmentAccess.HOME, EquipmentAccess.BASIC])
     .optional(),
   injuryOrRestriction: z.string().max(500).optional(),
+  sex: z.enum([Sex.MALE, Sex.FEMALE]),
+  waistCm: z.number().min(50).max(200).optional(),
+  neckCm: z.number().min(20).max(60).optional(),
+  hipCm: z.number().min(50).max(200).optional(),
 });
 
 export const CompleteOnboardingResponseSchema = z.object({
@@ -214,6 +220,10 @@ export const CompleteOnboardingResponseSchema = z.object({
     .enum([EquipmentAccess.FULL_GYM, EquipmentAccess.HOME, EquipmentAccess.BASIC])
     .nullable(),
   injuryOrRestriction: z.string().nullable(),
+  sex: z.enum([Sex.MALE, Sex.FEMALE]),
+  waistCm: z.number().nullable(),
+  neckCm: z.number().nullable(),
+  hipCm: z.number().nullable(),
   createdAt: z.date(),
 });
 
@@ -244,6 +254,33 @@ export const ExerciseSetLogSchema = z.object({
   setCompletedAt: z.date(),
   restInSeconds: z.number().int().nullable(),
   createdAt: z.date(),
+});
+
+// Body Metrics Schemas (Task 12 + 13)
+export const UserMetricsResponseSchema = z.object({
+  id: z.string().uuid(),
+  bmr: z.number().int(),
+  tdee: z.number().int(),
+  bodyFatPercentage: z.number(),
+  bodyFatMethod: z.enum([BodyFatMethod.US_NAVY, BodyFatMethod.CUN_BAE]),
+  fatMassKg: z.number(),
+  leanMassKg: z.number(),
+  caloricGoalMin: z.number().int(),
+  caloricGoalMax: z.number().int(),
+  proteinGrams: z.number().int(),
+  carbsGrams: z.number().int(),
+  fatGrams: z.number().int(),
+  projectionWeeks: z.number().int(),
+  projectedEndWeight: z.number(),
+  projectionSeries: z.array(
+    z.object({
+      day: z.number().int(),
+      weightKg: z.number(),
+      fatKg: z.number(),
+      leanKg: z.number(),
+    })
+  ),
+  createdAt: z.date().optional(),
 });
 
 export const SessionSetLogsResponseSchema = z.array(

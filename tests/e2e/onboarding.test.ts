@@ -28,6 +28,7 @@ describe("Onboarding E2E", () => {
       activityLevel: "MEDIUM",
       equipmentAccess: "FULL_GYM",
       injuryOrRestriction: "None",
+      sex: "MALE",
     };
 
     const response = await app.inject({
@@ -78,6 +79,7 @@ describe("Onboarding E2E", () => {
         heightInCentimeters: 180,
         weightInGrams: 75000,
         age: 25,
+        sex: "MALE",
       },
     });
 
@@ -105,6 +107,7 @@ describe("Onboarding E2E", () => {
       heightInCentimeters: 180,
       weightInGrams: 75000,
       age: 25,
+      sex: "MALE",
     };
 
     // First time
