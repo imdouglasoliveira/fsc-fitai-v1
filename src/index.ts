@@ -47,7 +47,8 @@ await app.register(fastifyCors, {
   credentials: true,
 });
 
-await app.register(apiReference, {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+await app.register(apiReference as any, {
   routePrefix: "/docs",
   configuration: {
     sources: [
