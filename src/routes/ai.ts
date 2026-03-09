@@ -41,6 +41,7 @@ export const aiRoutes = async (app: FastifyInstance) => {
 
       const result = streamText({
         model: openai("gpt-4o"),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         messages: request.body.messages as any,
         system: `Você é um personal trainer virtual especialista em montagem de planos de treino de musculação.
         Siga estas regras rigorosamente:

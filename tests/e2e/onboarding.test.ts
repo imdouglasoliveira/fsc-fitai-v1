@@ -1,6 +1,7 @@
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { createApp, createTestUser, cleanDatabase } from "./setup.js";
 import { FastifyInstance } from "fastify";
+import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+
+import { cleanDatabase,createApp, createTestUser } from "./setup.js";
 
 describe("Onboarding E2E", () => {
   let app: FastifyInstance;

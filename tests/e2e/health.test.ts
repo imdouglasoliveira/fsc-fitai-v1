@@ -1,6 +1,7 @@
-import { beforeAll, describe, expect, it } from "vitest";
-import { createApp } from "./setup.js";
 import { FastifyInstance } from "fastify";
+import { beforeAll, describe, expect, it } from "vitest";
+
+import { createApp } from "./setup.js";
 
 describe("Health Check E2E", () => {
   let app: FastifyInstance;

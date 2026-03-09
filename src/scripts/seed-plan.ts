@@ -68,12 +68,14 @@ async function main() {
     description: "Plano importado via seed.",
     isActive: true,
     workoutDays: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       create: payload.workoutDays.map((day: any) => ({
         name: day.name,
         weekDay: day.weekDay,
         isRest: day.isRest,
         estimatedDurationInSeconds: day.estimatedDurationInSeconds,
         exercises: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           create: day.exercises.map((ex: any) => ({
             name: ex.name,
             order: ex.order,

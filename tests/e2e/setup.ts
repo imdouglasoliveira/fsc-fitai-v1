@@ -1,8 +1,10 @@
 import "dotenv/config";
+
 import { FastifyInstance } from "fastify";
-import { prisma } from "../../src/lib/db.js";
+
 import { buildApp } from "../../src/app.js";
 import { auth } from "../../src/lib/auth.js";
+import { prisma } from "../../src/lib/db.js";
 
 export async function createApp(): Promise<FastifyInstance> {
   const app = await buildApp({ logger: false });
@@ -10,7 +12,7 @@ export async function createApp(): Promise<FastifyInstance> {
   return app;
 }
 
-export async function createTestUser(app: FastifyInstance): Promise<{
+export async function createTestUser(_app: FastifyInstance): Promise<{
   userId: string;
   headers: Record<string, string>;
 }> {
